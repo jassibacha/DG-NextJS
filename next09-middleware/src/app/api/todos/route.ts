@@ -8,7 +8,10 @@ const API_KEY: string = process.env.DATA_API_KEY as string
  * Fetches todos from the data source URL and returns them as a JSON response.
  * @returns {Promise<NextResponse>} A promise that resolves with a JSON response containing the todos.
  */
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: Request) {
+
+    const origin = request.headers.get('origin')
+    
     // Fetch todos from the data source URL
     const response = await fetch(DATA_SOURCE_URL)
 
@@ -16,7 +19,12 @@ export async function GET(): Promise<NextResponse> {
     const todos: Todo[] = await response.json()
 
     // Return a JSON response containing the todos
-    return NextResponse.json(todos)
+    return new NextResponse(JSON.stringify(todos), {
+        headers: {
+            'Access-Control-Allow-Origin': origin || '*',
+            'Content-Type': 'application/json',
+        }
+    })
 }
 
 export async function DELETE(request: Request) {
